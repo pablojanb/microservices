@@ -1,0 +1,125 @@
+version: '2.1'
+
+services:
+  eureka-sv:
+    build: eureka-sv
+    mem_limit: 512m
+    ports:
+      - "8761:8761"
+    networks:
+      - 'ecommerce-network'
+  config-server:
+    build: config-server
+    mem_limit: 512m
+    ports:
+      - "8081:8081"
+    networks:
+      - 'ecommerce-network'
+  api-gateway:
+    build: api-gateway
+    mem_limit: 512m
+    ports:
+      - "443:443"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-sv:8761/eureka/
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8081
+    networks:
+      - 'ecommerce-network'
+  products:
+    image: mysql:9.1.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: products_db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    networks:
+      - 'ecommerce-network'
+  carts:
+    image: mysql:9.1.0
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: carts_db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    networks:
+      - 'ecommerce-network'
+  sales:
+    image: mysql:9.1.0
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: sales_db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    networks:
+      - 'ecommerce-network'
+  carts-service:
+    build: carts-service
+    mem_limit: 512m
+    ports:
+      - "8084:8084"
+    environment:
+      DB_URL: jdbc:mysql://carts:3306/carts_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: 1234
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-sv:8761/eureka/
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8081
+    restart: always
+    depends_on:
+      carts:
+        condition: service_healthy
+    networks:
+      - 'ecommerce-network'
+  products-service:
+    build: products-service
+    mem_limit: 512m
+    ports:
+      - "8082:8082"
+    environment:
+      DB_URL: jdbc:mysql://products:3306/products_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: 1234
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-sv:8761/eureka/
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8081
+    restart: always
+    depends_on:
+      products:
+        condition: service_healthy
+    networks:
+      - 'ecommerce-network'
+  sales-service:
+    build: sales-service
+    mem_limit: 512m
+    ports:
+      - "8086:8086"
+    environment:
+      DB_URL: jdbc:mysql://sales:3306/sales_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: 1234
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-sv:8761/eureka/
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8081
+    restart: always
+    depends_on:
+      sales:
+        condition: service_healthy
+    networks:
+      - 'ecommerce-network'
+networks:
+  ecommerce-network:
