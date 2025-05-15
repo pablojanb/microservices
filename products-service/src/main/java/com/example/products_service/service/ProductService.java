@@ -21,4 +21,23 @@ public class ProductService implements IProductService{
     public Product getProductById(Long id) {
         return iProductRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public void addProduct(Product product) {
+        iProductRepository.save(product);
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+        iProductRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateProduct(Long id, Product product) {
+        Product updatedProduct = this.getProductById(id);
+        updatedProduct.setBrand(product.getBrand());
+        updatedProduct.setName(product.getName());
+        updatedProduct.setPrice(product.getPrice());
+        this.addProduct(updatedProduct);
+    }
 }
