@@ -21,4 +21,23 @@ public class CartController {
     public Cart getCartById(@PathVariable Long cart_id) {
         return iCartService.getCartById(cart_id);
     }
+
+    @PostMapping("")
+    public String addCart(){
+        iCartService.addCart();
+        return "Cart added";
+    }
+
+    @PutMapping("/{cart_id}")
+    public String emptyCart(@PathVariable Long cart_id){
+        iCartService.emptyCart(cart_id);
+        return "Cart is empty";
+    }
+
+    @DeleteMapping("/{cart_id}/product/{product_id}")
+    public String removeProductFromCart(@PathVariable Long cart_id,
+                            @PathVariable Long product_id){
+        iCartService.removeProductFromCart(cart_id, product_id);
+        return "Product deleted";
+    }
 }

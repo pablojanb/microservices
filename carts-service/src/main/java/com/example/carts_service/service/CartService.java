@@ -9,6 +9,8 @@ import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class CartService implements ICartService{
     @Autowired
@@ -39,7 +41,32 @@ public class CartService implements ICartService{
     }
 
     @Override
-    public void addCart(Cart cart) {
+    public void addCart() {
+        Cart cart = new Cart();
         iCartRepository.save(cart);
+    }
+
+    @Override
+    public void addCart(Cart cart) {
+        Cart cartAdded = iCartRepository.save(cart);
+    }
+
+    @Override
+    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackAddProductToCart")
+    @Retry(name = "products-service")
+    public void removeProductFromCart(Long cart_id, Long product_id) {
+        Cart cart = this.getCartById(cart_id);
+        cart.getProductsList().removeIf(id -> product_id == id);
+        ProductDTO productDTO = iProductsApi.getProductById(product_id);
+        cart.setCart_total(cart.getCart_total()-productDTO.getPrice());
+        this.addCart(cart);
+    }
+
+    @Override
+    public void emptyCart(Long id) {
+        Cart cart = this.getCartById(id);
+        cart.setProductsList(new ArrayList<>());
+        cart.setCart_total(0.0);
+        this.addCart(cart);
     }
 }

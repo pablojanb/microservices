@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class SaleService implements ISaleService{
@@ -22,7 +23,7 @@ public class SaleService implements ISaleService{
     @Override
     @CircuitBreaker(name = "carts-service", fallbackMethod = "fallbackAddSale")
     @Retry(name = "carts-service")
-    public String addSale(Long cart_id) {
+    public Sale addSale(Long cart_id) {
         CartDTO cart = iCartApi.getCartById(cart_id);
         Sale sale = new Sale();
         sale.setSale_date(LocalDate.now());
@@ -30,7 +31,18 @@ public class SaleService implements ISaleService{
         sale.setProductsList(cart.getProductsList());
         sale.setCart_id(cart_id);
         iSaleRepository.save(sale);
-        return "Sale added";
+        iCartApi.emptyCart(cart_id);
+        return sale;
+    }
+
+    @Override
+    public Sale getSale(Long sale_id) {
+        return iSaleRepository.findById(sale_id).orElse(null);
+    }
+
+    @Override
+    public List<Sale> getSales() {
+        return iSaleRepository.findAll();
     }
 
     public String fallbackAddSale(Throwable throwable){

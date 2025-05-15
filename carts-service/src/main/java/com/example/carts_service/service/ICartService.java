@@ -8,5 +8,11 @@ public interface ICartService {
 
     String addProductToCart(Long cart_id, Long product_id);
 
+    void addCart();
+
     void addCart(Cart cart);
+
+    void removeProductFromCart(Long cart_id, Long product_id);
+
+    void emptyCart(Long id);
 }

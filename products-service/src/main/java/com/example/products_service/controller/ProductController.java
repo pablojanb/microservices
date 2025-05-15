@@ -29,9 +29,8 @@ public class ProductController {
     }
 
     @PostMapping("")
-    public String addProduct(@RequestBody Product product){
-        iProductService.addProduct(product);
-        return "Product added";
+    public Product addProduct(@RequestBody Product product){
+        return iProductService.addProduct(product);
     }
 
     @DeleteMapping("/{id}")
@@ -41,10 +40,9 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public String deleteProduct(@PathVariable Long id,
+    public Product updateProduct(@PathVariable Long id,
                                 @RequestBody Product product){
-        iProductService.updateProduct(id, product);
-        return "Product updated";
+        return iProductService.updateProduct(id, product);
     }
 
 }

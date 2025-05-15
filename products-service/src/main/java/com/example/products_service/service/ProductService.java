@@ -23,8 +23,8 @@ public class ProductService implements IProductService{
     }
 
     @Override
-    public void addProduct(Product product) {
-        iProductRepository.save(product);
+    public Product addProduct(Product product) {
+        return iProductRepository.save(product);
     }
 
     @Override
@@ -33,11 +33,11 @@ public class ProductService implements IProductService{
     }
 
     @Override
-    public void updateProduct(Long id, Product product) {
+    public Product updateProduct(Long id, Product product) {
         Product updatedProduct = this.getProductById(id);
         updatedProduct.setBrand(product.getBrand());
         updatedProduct.setName(product.getName());
         updatedProduct.setPrice(product.getPrice());
-        this.addProduct(updatedProduct);
+        return this.addProduct(updatedProduct);
     }
 }
