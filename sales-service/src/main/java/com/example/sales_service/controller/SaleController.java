@@ -1,5 +1,6 @@
 package com.example.sales_service.controller;
 
+import com.example.sales_service.dto.ProductDTO;
 import com.example.sales_service.model.Sale;
 import com.example.sales_service.service.ISaleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,18 @@ public class SaleController {
         return iSaleService.getSale(sale_id);
     }
 
+    @GetMapping("/biggest_sale")
+    public Sale getBiggestSale(){
+        return iSaleService.getBiggestSale();
+    }
+
     @GetMapping("")
     public List<Sale> getSale(){
         return iSaleService.getSales();
+    }
+
+    @GetMapping("/products/{sale_id}")
+    public List<ProductDTO> getProductsBySale(@PathVariable Long sale_id){
+        return iSaleService.getProductsBySale(sale_id);
     }
 }

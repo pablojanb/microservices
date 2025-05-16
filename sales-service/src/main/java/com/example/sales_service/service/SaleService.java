@@ -1,8 +1,10 @@
 package com.example.sales_service.service;
 
 import com.example.sales_service.dto.CartDTO;
+import com.example.sales_service.dto.ProductDTO;
 import com.example.sales_service.model.Sale;
 import com.example.sales_service.repository.ICartApi;
+import com.example.sales_service.repository.IProductApi;
 import com.example.sales_service.repository.ISaleRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +22,9 @@ public class SaleService implements ISaleService{
 
     @Autowired
     private ICartApi iCartApi;
+
+    @Autowired
+    private IProductApi iProductApi;
 
     @Override
     @CircuitBreaker(name = "carts-service", fallbackMethod = "fallbackAddSale")
@@ -35,6 +41,10 @@ public class SaleService implements ISaleService{
         return sale;
     }
 
+    public Sale fallbackAddSale(Throwable throwable){
+        return null;
+    }
+
     @Override
     public Sale getSale(Long sale_id) {
         return iSaleRepository.findById(sale_id).orElse(null);
@@ -45,7 +55,26 @@ public class SaleService implements ISaleService{
         return iSaleRepository.findAll();
     }
 
-    public String fallbackAddSale(Throwable throwable){
-        return "Try again later";
+    @Override
+    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackGetProductsBySale")
+    @Retry(name = "products-service")
+    public List<ProductDTO> getProductsBySale(Long sale_id) {
+        List<ProductDTO> productDTOList = new ArrayList<>();
+        Sale sale = this.getSale(sale_id);
+        for (Long product_id : sale.getProductsList()){
+            ProductDTO productDTO = iProductApi.getProductById(product_id);
+            productDTOList.add(productDTO);
+        }
+        return productDTOList;
+    }
+
+    public List<ProductDTO> fallbackGetProductsBySale(Throwable throwable){
+        return null;
+    }
+
+    @Override
+    public Sale getBiggestSale() {
+        List<Sale> saleList = iSaleRepository.getBiggestSale();
+        return saleList.get(0);
     }
 }

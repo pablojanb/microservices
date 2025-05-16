@@ -6,13 +6,13 @@ public interface ICartService {
 
     Cart getCartById(Long cart_id);
 
-    String addProductToCart(Long cart_id, Long product_id);
+    Cart addProductToCart(Long cart_id, Long product_id);
 
-    void addCart();
+    Cart addCart();
 
-    void addCart(Cart cart);
+    Cart addCart(Cart cart);
 
-    void removeProductFromCart(Long cart_id, Long product_id);
+    Cart removeProductFromCart(Long cart_id, Long product_id);
 
-    void emptyCart(Long id);
+    Cart emptyCart(Long id);
 }

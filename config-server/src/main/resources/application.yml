@@ -11,7 +11,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/pablojanb/test-config-02.git
+          uri: https://github.com/pablojanb/microservices.git
           searchPaths: config-data
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}

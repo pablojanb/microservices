@@ -22,6 +22,11 @@ public class ProductController {
         return iProductService.getAllProducts();
     }
 
+    @GetMapping("/low_stock")
+    public List<Product> getProductsLowStock(){
+        return iProductService.getProductsLowStock();
+    }
+
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id){
         System.out.println("Server: " + server);
@@ -44,5 +49,4 @@ public class ProductController {
                                 @RequestBody Product product){
         return iProductService.updateProduct(id, product);
     }
-
 }

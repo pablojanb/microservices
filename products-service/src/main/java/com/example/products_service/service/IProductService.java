@@ -8,6 +8,8 @@ public interface IProductService {
 
     List<Product> getAllProducts();
 
+    List<Product> getProductsLowStock();
+
     Product getProductById(Long id);
 
     Product addProduct(Product product);

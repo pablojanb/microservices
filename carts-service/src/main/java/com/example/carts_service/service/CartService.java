@@ -25,48 +25,54 @@ public class CartService implements ICartService{
     }
 
     @Override
-    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackAddProductToCart")
+    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackProductToCart")
     @Retry(name = "products-service")
-    public String addProductToCart(Long cart_id, Long product_id) {
+    public Cart addProductToCart(Long cart_id, Long product_id) {
         Cart cart = this.getCartById(cart_id);
         ProductDTO productDTO = iProductsApi.getProductById(product_id);
+        if (cart == null || productDTO == null) {
+            return null;
+        }
         cart.getProductsList().add(productDTO.getProduct_id());
         cart.setCart_total(cart.getCart_total() + productDTO.getPrice());
         this.addCart(cart);
-        return "Product added to cart";
+        return cart;
     }
 
-    public String fallbackAddProductToCart(Throwable throwable){
-        return "Try again later";
+    public Cart fallbackProductToCart(Throwable throwable){
+        return null;
     }
 
     @Override
-    public void addCart() {
+    public Cart addCart() {
         Cart cart = new Cart();
-        iCartRepository.save(cart);
+        return iCartRepository.save(cart);
     }
 
     @Override
-    public void addCart(Cart cart) {
-        Cart cartAdded = iCartRepository.save(cart);
+    public Cart addCart(Cart cart) {
+        return iCartRepository.save(cart);
     }
 
     @Override
-    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackAddProductToCart")
+    @CircuitBreaker(name = "products-service", fallbackMethod = "fallbackProductToCart")
     @Retry(name = "products-service")
-    public void removeProductFromCart(Long cart_id, Long product_id) {
+    public Cart removeProductFromCart(Long cart_id, Long product_id) {
         Cart cart = this.getCartById(cart_id);
-        cart.getProductsList().removeIf(id -> product_id == id);
         ProductDTO productDTO = iProductsApi.getProductById(product_id);
+        boolean deleted = cart.getProductsList().removeIf(id -> product_id == id);
+        if (productDTO == null || !deleted) {
+            return null;
+        }
         cart.setCart_total(cart.getCart_total()-productDTO.getPrice());
-        this.addCart(cart);
+        return this.addCart(cart);
     }
 
     @Override
-    public void emptyCart(Long id) {
+    public Cart emptyCart(Long id) {
         Cart cart = this.getCartById(id);
         cart.setProductsList(new ArrayList<>());
         cart.setCart_total(0.0);
-        this.addCart(cart);
+        return this.addCart(cart);
     }
 }

@@ -18,5 +18,6 @@ public class Product {
     private Long product_id;
     private String name;
     private String brand;
+    private int stock;
     private double price;
 }
