@@ -1,4 +1,4 @@
-# Products, Carts, and Sales Management Project using Java, Spring, MySQL y Hibernate
+# Products, Carts, and Sales Management Project using Java, Spring, MySQL and Hibernate
 
 ## Description
 
@@ -34,6 +34,7 @@ It was developed as part of the "Microservicios con Spring Cloud" course by Todo
 - **Extras:**
   - Get the product list from a specific sale: `GET /sales/products/{sale_id}`
   - Get details of the highest-value sale: `GET /sales/biggest_sale`
+  - Get the total amount and number of sales for a specific day `GET /sales/date/{sale_date}`
 
 ## Technologies
 

@@ -2,6 +2,7 @@ package com.example.sales_service.service;
 
 import com.example.sales_service.dto.CartDTO;
 import com.example.sales_service.dto.ProductDTO;
+import com.example.sales_service.dto.SalesByDate;
 import com.example.sales_service.model.Sale;
 import com.example.sales_service.repository.ICartApi;
 import com.example.sales_service.repository.IProductApi;
@@ -76,5 +77,18 @@ public class SaleService implements ISaleService{
     public Sale getBiggestSale() {
         List<Sale> saleList = iSaleRepository.getBiggestSale();
         return saleList.get(0);
+    }
+
+    @Override
+    public SalesByDate getSalesByDate(LocalDate sale_date) {
+        List<Sale> saleList = iSaleRepository.getSalesByDate(sale_date);
+        SalesByDate salesByDate = new SalesByDate();
+        salesByDate.setSales(saleList.size());
+        double total = 0;
+        for (Sale sale : saleList) {
+            total += sale.getSale_total();
+        }
+        salesByDate.setTotal(total);
+        return salesByDate;
     }
 }

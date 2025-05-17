@@ -1,8 +1,10 @@
 package com.example.sales_service.service;
 
 import com.example.sales_service.dto.ProductDTO;
+import com.example.sales_service.dto.SalesByDate;
 import com.example.sales_service.model.Sale;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ISaleService {
@@ -15,4 +17,6 @@ public interface ISaleService {
     List<ProductDTO> getProductsBySale(Long sale_id);
 
     Sale getBiggestSale();
+
+    SalesByDate getSalesByDate(LocalDate sale_date);
 }
